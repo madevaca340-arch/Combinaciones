@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Combinaciones - Módulo Interactivo</title>
+<title>Combinaciones Interactivas</title>
 
 <style>
 body{
@@ -13,16 +13,29 @@ body{
     overflow:hidden;
 }
 
-/* PERSONAJE */
-.personaje{
-    margin-top:30px;
-    animation: mover 2s infinite ease-in-out;
+/* BOTÓN */
+#btnInicio{
+    margin-top:40px;
+    padding:15px 30px;
+    font-size:18px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
 }
 
-@keyframes mover{
-    0%{transform: translateY(0);}
-    50%{transform: translateY(-8px);}
-    100%{transform: translateY(0);}
+/* PERSONAJE */
+.personaje{
+    margin-top:20px;
+    display:none;
+    animation: balanceo 3s infinite ease-in-out;
+}
+
+@keyframes balanceo{
+    0%{transform: rotate(0deg);}
+    50%{transform: rotate(2deg);}
+    100%{transform: rotate(0deg);}
 }
 
 .cabeza{
@@ -57,12 +70,48 @@ body{
     transition:0.1s;
 }
 
+/* CUERPO */
 .cuerpo{
     width:80px;
     height:120px;
     background:#4CAF50;
     margin:auto;
     border-radius:10px;
+    position:relative;
+}
+
+/* BRAZOS */
+.brazo{
+    width:15px;
+    height:80px;
+    background:#FFD8B1;
+    position:absolute;
+    top:10px;
+    border-radius:10px;
+}
+
+.brazo.izq{
+    left:-20px;
+    transform-origin: top;
+    animation: brazoIzq 2s infinite ease-in-out;
+}
+
+.brazo.der{
+    right:-20px;
+    transform-origin: top;
+    animation: brazoDer 2s infinite ease-in-out;
+}
+
+@keyframes brazoIzq{
+    0%{transform: rotate(10deg);}
+    50%{transform: rotate(-20deg);}
+    100%{transform: rotate(10deg);}
+}
+
+@keyframes brazoDer{
+    0%{transform: rotate(-10deg);}
+    50%{transform: rotate(20deg);}
+    100%{transform: rotate(-10deg);}
 }
 
 /* OBJETOS */
@@ -84,13 +133,18 @@ body{
 
 <body>
 
-<div class="personaje">
+<button id="btnInicio">Iniciar explicación</button>
+
+<div class="personaje" id="personaje">
     <div class="cabeza">
         <div class="ojo izq"></div>
         <div class="ojo der"></div>
         <div class="boca" id="boca"></div>
     </div>
-    <div class="cuerpo"></div>
+    <div class="cuerpo">
+        <div class="brazo izq"></div>
+        <div class="brazo der"></div>
+    </div>
 </div>
 
 <div class="objetos" id="zonaObjetos">
@@ -100,50 +154,53 @@ body{
     <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png">
 </div>
 
-<audio id="musica" loop autoplay>
+<audio id="musica" loop>
 <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5f4b3c6f6a.mp3?filename=soft-background-music-12146.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 
-// DEFINICIÓN CORRECTA
 const texto = `
 Una combinación es una forma de seleccionar 
 varios elementos de un conjunto, 
 donde el orden no cambia el resultado. 
-Esto significa que elegir A, B y C 
-es lo mismo que elegir C, B y A. 
-En las combinaciones importa 
-qué elementos se escogen, 
-pero no importa el orden en que se escriben. 
-Las combinaciones nos permiten contar 
-cuántos grupos diferentes se pueden formar 
+Elegir A, B y C es lo mismo que elegir C, B y A. 
+En las combinaciones importa qué elementos se escogen, 
+pero no el orden en que se organizan. 
+Así podemos contar cuántos grupos diferentes se forman 
 sin repetir los mismos elementos en distinto orden.
 `;
 
-const boca = document.getElementById("boca");
+const boca=document.getElementById("boca");
 let intervaloBoca;
 
-function hablar(){
-    const mensaje = new SpeechSynthesisUtterance(texto);
+document.getElementById("btnInicio").addEventListener("click",function(){
+
+    document.getElementById("btnInicio").style.display="none";
+    document.getElementById("personaje").style.display="block";
+
+    const musica=document.getElementById("musica");
+    musica.volume=0.6;   // 🔊 más volumen
+    musica.play();
+
+    const mensaje=new SpeechSynthesisUtterance(texto);
     mensaje.lang="es-ES";
     mensaje.rate=0.9;
 
-    intervaloBoca = setInterval(()=>{
-        boca.style.height = boca.style.height==="25px"?"15px":"25px";
-    },150);
+    intervaloBoca=setInterval(()=>{
+        boca.style.height=boca.style.height==="30px"?"15px":"30px";
+    },120);
 
     mensaje.onend=function(){
         clearInterval(intervaloBoca);
-        boca.style.height="15px";
         iniciarCombinaciones();
     }
 
     speechSynthesis.speak(mensaje);
-}
+});
 
-// COMBINACIONES REALES (4 objetos tomados de 3 en 3)
 function iniciarCombinaciones(){
+
     const zona=document.getElementById("zonaObjetos");
     zona.style.display="block";
 
@@ -159,9 +216,7 @@ function iniciarCombinaciones(){
     let indice=0;
 
     setInterval(()=>{
-        objetos.forEach(obj=>{
-            obj.style.opacity="0";
-        });
+        objetos.forEach(obj=>obj.style.opacity="0");
 
         setTimeout(()=>{
             objetos.forEach((obj,i)=>{
@@ -180,11 +235,6 @@ function iniciarCombinaciones(){
 
     },3000);
 }
-
-window.onload=function(){
-    document.getElementById("musica").volume=0.2;
-    hablar();
-};
 
 </script>
 
