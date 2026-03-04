@@ -2,130 +2,76 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Combinaciones Interactivas</title>
-
+<title>Combinaciones Animadas</title>
 <style>
+
 body{
     margin:0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom,#dbeafe,#ffffff);
-    text-align:center;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
     overflow:hidden;
-}
-
-/* BOTÓN */
-#btnInicio{
-    margin-top:40px;
-    padding:15px 30px;
-    font-size:18px;
-    background:#2563eb;
     color:white;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
 }
 
-/* PERSONAJE */
+.container{
+    display:flex;
+    height:100vh;
+}
+
+.left{
+    width:40%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background:rgba(0,0,0,0.3);
+}
+
+.right{
+    width:60%;
+    position:relative;
+}
+
 .personaje{
+    width:150px;
+    height:150px;
+    background:#f6c23e;
+    border-radius:50%;
+    animation: respirar 2s infinite;
+}
+
+@keyframes respirar{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.05);}
+    100%{transform:scale(1);}
+}
+
+.subtitulo{
     margin-top:20px;
-    display:none;
-    animation: balanceo 3s infinite ease-in-out;
+    font-size:18px;
+    min-height:60px;
+    text-align:center;
 }
 
-@keyframes balanceo{
-    0%{transform: rotate(0deg);}
-    50%{transform: rotate(2deg);}
-    100%{transform: rotate(0deg);}
-}
-
-.cabeza{
-    width:120px;
-    height:120px;
-    background:#FFD8B1;
-    border-radius:50%;
-    margin:auto;
-    position:relative;
-}
-
-.ojo{
-    width:15px;
-    height:15px;
-    background:black;
-    border-radius:50%;
+.objeto{
     position:absolute;
-    top:40px;
-}
-
-.ojo.izq{ left:30px; }
-.ojo.der{ right:30px; }
-
-.boca{
-    width:40px;
-    height:15px;
-    background:#c0392b;
-    border-radius:0 0 20px 20px;
-    position:absolute;
-    bottom:30px;
-    left:40px;
-    transition:0.1s;
-}
-
-/* CUERPO */
-.cuerpo{
-    width:80px;
-    height:120px;
-    background:#4CAF50;
-    margin:auto;
+    padding:15px;
+    background:#36b9cc;
     border-radius:10px;
-    position:relative;
+    font-weight:bold;
+    transition:all 1s ease;
 }
 
-/* BRAZOS */
-.brazo{
-    width:15px;
-    height:80px;
-    background:#FFD8B1;
-    position:absolute;
-    top:10px;
-    border-radius:10px;
-}
+#obj1{top:150px; left:200px;}
+#obj2{top:150px; left:400px;}
 
-.brazo.izq{
-    left:-20px;
-    transform-origin: top;
-    animation: brazoIzq 2s infinite ease-in-out;
-}
-
-.brazo.der{
-    right:-20px;
-    transform-origin: top;
-    animation: brazoDer 2s infinite ease-in-out;
-}
-
-@keyframes brazoIzq{
-    0%{transform: rotate(10deg);}
-    50%{transform: rotate(-20deg);}
-    100%{transform: rotate(10deg);}
-}
-
-@keyframes brazoDer{
-    0%{transform: rotate(-10deg);}
-    50%{transform: rotate(20deg);}
-    100%{transform: rotate(-10deg);}
-}
-
-/* OBJETOS */
-.objetos{
-    position:absolute;
-    bottom:40px;
-    width:100%;
-    display:none;
-}
-
-.objetos img{
-    width:70px;
-    position:absolute;
-    transition: all 1.5s ease-in-out;
+button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    margin-top:20px;
+    cursor:pointer;
+    font-weight:bold;
 }
 
 </style>
@@ -133,107 +79,54 @@ body{
 
 <body>
 
-<button id="btnInicio">Iniciar explicación</button>
+<div class="container">
 
-<div class="personaje" id="personaje">
-    <div class="cabeza">
-        <div class="ojo izq"></div>
-        <div class="ojo der"></div>
-        <div class="boca" id="boca"></div>
-    </div>
-    <div class="cuerpo">
-        <div class="brazo izq"></div>
-        <div class="brazo der"></div>
-    </div>
+<div class="left">
+    <div class="personaje"></div>
+    <div class="subtitulo" id="texto"></div>
+    <button onclick="iniciar()">Explicar</button>
 </div>
 
-<div class="objetos" id="zonaObjetos">
-    <img src="https://cdn-icons-png.flaticon.com/512/415/415733.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/590/590685.png">
-    <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png">
+<div class="right">
+    <div class="objeto" id="obj1">Camisa</div>
+    <div class="objeto" id="obj2">Pantalón</div>
 </div>
 
-<audio id="musica" loop>
-<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5f4b3c6f6a.mp3?filename=soft-background-music-12146.mp3" type="audio/mpeg">
-</audio>
+</div>
 
 <script>
 
-const texto = `
-Una combinación es una forma de seleccionar 
-varios elementos de un conjunto, 
-donde el orden no cambia el resultado. 
-Elegir A, B y C es lo mismo que elegir C, B y A. 
-En las combinaciones importa qué elementos se escogen, 
-pero no el orden en que se organizan. 
-Así podemos contar cuántos grupos diferentes se forman 
-sin repetir los mismos elementos en distinto orden.
-`;
+let frases = [
+"Una combinación es una forma de elegir elementos.",
+"En una combinación el orden NO importa.",
+"Observa cómo cambian de lugar...",
+"Pero sigue siendo el mismo grupo."
+];
 
-const boca=document.getElementById("boca");
-let intervaloBoca;
+let i = 0;
 
-document.getElementById("btnInicio").addEventListener("click",function(){
+function iniciar(){
+    let intervalo = setInterval(()=>{
+        document.getElementById("texto").innerText = frases[i];
+        
+        if(i === 2){
+            intercambiar();
+        }
 
-    document.getElementById("btnInicio").style.display="none";
-    document.getElementById("personaje").style.display="block";
-
-    const musica=document.getElementById("musica");
-    musica.volume=0.6;   // 🔊 más volumen
-    musica.play();
-
-    const mensaje=new SpeechSynthesisUtterance(texto);
-    mensaje.lang="es-ES";
-    mensaje.rate=0.9;
-
-    intervaloBoca=setInterval(()=>{
-        boca.style.height=boca.style.height==="30px"?"15px":"30px";
-    },120);
-
-    mensaje.onend=function(){
-        clearInterval(intervaloBoca);
-        iniciarCombinaciones();
-    }
-
-    speechSynthesis.speak(mensaje);
-});
-
-function iniciarCombinaciones(){
-
-    const zona=document.getElementById("zonaObjetos");
-    zona.style.display="block";
-
-    const objetos=zona.querySelectorAll("img");
-
-    const posiciones=[
-        [20,40,60],
-        [20,40,80],
-        [20,60,80],
-        [40,60,80]
-    ];
-
-    let indice=0;
-
-    setInterval(()=>{
-        objetos.forEach(obj=>obj.style.opacity="0");
-
-        setTimeout(()=>{
-            objetos.forEach((obj,i)=>{
-                if(i<3){
-                    obj.style.left=posiciones[indice][i]+"%";
-                    obj.style.bottom="120px";
-                    obj.style.opacity="1";
-                }else{
-                    obj.style.opacity="0";
-                }
-            });
-
-            indice=(indice+1)%posiciones.length;
-
-        },500);
+        i++;
+        if(i >= frases.length){
+            clearInterval(intervalo);
+        }
 
     },3000);
+}
+
+function intercambiar(){
+    let o1 = document.getElementById("obj1");
+    let o2 = document.getElementById("obj2");
+
+    o1.style.left = "400px";
+    o2.style.left = "200px";
 }
 
 </script>
